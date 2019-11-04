@@ -1,5 +1,7 @@
 package cyoa
 
+type Story map[string]Chapter
+
 // Chapter is a part of the story
 type Chapter struct {
 	Title   string   `json:"title"`

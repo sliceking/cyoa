@@ -21,18 +21,13 @@ func main() {
 	}
 	defer file.Close()
 
-	var cyoa cyoa.Chapter
+	// parse json
+	var adventure cyoa.Story
+
 	r := json.NewDecoder(file)
-	err = r.Decode(&cyoa)
+	err = r.Decode(&adventure)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(cyoa)
-
-	// parse json
-	// adventure := json.Unmarshal(r, cyoa)
-
-	// create structs
-
-	// print
+	fmt.Println(adventure)
 }
