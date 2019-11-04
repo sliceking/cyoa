@@ -22,9 +22,9 @@ func main() {
 	defer file.Close()
 
 	// parse json
-	var adventure cyoa.Story
 
 	r := json.NewDecoder(file)
+	var adventure cyoa.Story
 	err = r.Decode(&adventure)
 	if err != nil {
 		panic(err)
