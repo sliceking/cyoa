@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 
 	"github.com/svwielga4/cyoa"
@@ -10,6 +12,7 @@ import (
 
 func main() {
 	// create flag to accept
+	port := flag.Int("port", 3000, "the port to start your CYOA app on")
 	f := flag.String("file", "gopher.json", "The name of the file with a create your own adventure story")
 	flag.Parse()
 
@@ -25,5 +28,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(adventure)
+
+	h := cyoa.NewHandler(adventure)
+	fmt.Println("starting the server on port: %d\n", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), h))
 }
