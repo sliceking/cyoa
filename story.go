@@ -2,18 +2,18 @@ package cyoa
 
 import (
 	"encoding/json"
-	"net/http"
-	"io"
 	"html/template"
+	"io"
+	"net/http"
 )
 
 var tpl *template.Template
 
-func init(){
-	tpl := template.Must(template.New("").Parse(defaultHandlerTmpl))
+func init() {
+	tpl = template.Must(template.New("").Parse(defaultHandlerTmpl))
 }
 
-defaultHandlerTmpl := `
+var defaultHandlerTmpl = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,10 +39,10 @@ defaultHandlerTmpl := `
 </html>`
 
 func NewHandler(s Story) http.Handler {
-	return handler
+	return handler{s}
 }
 
-type handler struct{
+type handler struct {
 	s Story
 }
 
