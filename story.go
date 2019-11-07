@@ -2,7 +2,7 @@ package cyoa
 
 import (
 	"encoding/json"
-	"http"
+	"net/http"
 	"io"
 	"html/template"
 )
