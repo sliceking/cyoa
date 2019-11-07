@@ -30,6 +30,6 @@ func main() {
 	}
 
 	h := cyoa.NewHandler(adventure)
-	fmt.Println("starting the server on port: %d\n", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), h))
+	fmt.Printf("starting the server on port: %d\n", *port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), h))
 }

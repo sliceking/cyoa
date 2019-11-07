@@ -29,7 +29,6 @@ var defaultHandlerTmpl = `
     <p>{{.}}</p>
   {{end}}
 
-  <p>{{.Story}}</p>
   <ul>
     {{range .Options}}
       <li><a href="{{.Chapter}}">{{.Text}}</a></li>
