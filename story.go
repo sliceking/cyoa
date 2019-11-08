@@ -2,9 +2,9 @@ package cyoa
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -58,15 +58,12 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if chapter, ok := h.s[path]; ok {
 		err := tpl.Execute(w, chapter)
 		if err != nil {
-			panic(err)
+			log.Printf("%v", err)
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		}
+		return
 	}
-
-	fmt.Println(r.URL.Path)
-	// err := tpl.Execute(w, chapter)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	http.Error(w, "Chapter not found", http.StatusNotFound)
 }
 
 // NewStory takes in a reader or file and returns a story
