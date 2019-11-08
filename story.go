@@ -2,6 +2,7 @@ package cyoa
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
@@ -46,10 +47,26 @@ type handler struct {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := tpl.Execute(w, h.s["intro"])
-	if err != nil {
-		panic(err)
+	if r.URL.Path == "" || r.URL.Path == "/" {
+		err := tpl.Execute(w, h.s["intro"])
+		if err != nil {
+			panic(err)
+		}
 	}
+
+	path := r.URL.Path[1:]
+	if chapter, ok := h.s[path]; ok {
+		err := tpl.Execute(w, chapter)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	fmt.Println(r.URL.Path)
+	// err := tpl.Execute(w, chapter)
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
 
 // NewStory takes in a reader or file and returns a story
