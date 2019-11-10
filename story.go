@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 )
 
 var tpl *template.Template
@@ -38,17 +39,35 @@ var defaultHandlerTmpl = `
 </body>
 </html>`
 
-// HandlerOption is a config
+// HandlerOption is a config option that modifies the http handler
 type HandlerOption func(h *handler)
 
+// WithTemplate is a handler option that allows the customization of templates
 func WithTemplate(t *template.Template) HandlerOption {
 	return func(h *handler) {
 		h.t = t
 	}
 }
 
+// WithPathFunc is a handler option that alllows the customization of routes
+func WithPathFunc(fn func(r *http.Request) string) HandlerOption {
+	return func(h *handler) {
+		h.pathFunc = fn
+	}
+}
+
+func defaultPathFunc(r *http.Request) string {
+	path := strings.TrimSpace(r.URL.Path)
+	if path == "" || path == "/" {
+		path = "/intro"
+	}
+
+	return path[1:]
+}
+
+// NewHandler creates a handler by taking in a story and handler options
 func NewHandler(s Story, opts ...HandlerOption) http.Handler {
-	h := handler{s, tpl}
+	h := handler{s, tpl, defaultPathFunc}
 	for _, opt := range opts {
 		opt(&h)
 	}
@@ -56,20 +75,13 @@ func NewHandler(s Story, opts ...HandlerOption) http.Handler {
 }
 
 type handler struct {
-	s Story
-	t *template.Template
+	s        Story
+	t        *template.Template
+	pathFunc func(r *http.Request) string
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "" || r.URL.Path == "/" {
-		err := tpl.Execute(w, h.s["intro"])
-		if err != nil {
-			panic(err)
-		}
-		return
-	}
-
-	path := r.URL.Path[1:]
+	path := h.pathFunc(r)
 	if chapter, ok := h.s[path]; ok {
 		err := tpl.Execute(w, chapter)
 		if err != nil {
@@ -93,17 +105,17 @@ func NewStory(file io.Reader) (Story, error) {
 	return adventure, nil
 }
 
-// Story is comprised of chapters
+// Story is map comprised of chapters
 type Story map[string]Chapter
 
-// Chapter is a part of the story
+// Chapter is a part of the story, options are links to different chapters
 type Chapter struct {
 	Title      string   `json:"title"`
 	Paragraphs []string `json:"story"`
 	Options    []Option `json:"options"`
 }
 
-// Option is where you can go from a chapter
+// Option is where you can go to from the current chapter
 type Option struct {
 	Text    string `json:"text"`
 	Chapter string `json:"arc"`
